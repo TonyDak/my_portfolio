@@ -108,7 +108,8 @@
                 <div class="row">
                     <!--Grid column-->
                     <div class="col-md-9 mb-md-0 mb-5">
-                        <form id="contact-form" name="contact-form" action="mail.php" method="POST">
+                        <form id="contact-form" name="contact-form" action="mail.php" method="POST"
+                            onsubmit="return validateForm()">
                             <!--Grid row-->
                             <div class="row">
                                 <!--Grid column-->
@@ -157,10 +158,9 @@
                         </form>
 
                         <div class="text-center text-md-left">
-                            <a class="btn btn-primary"
-                                onclick="document.getElementById('contact-form').submit();">Send</a>
+                            <a class="btn btn-primary" onclick="validateForm()">Send</a>
                         </div>
-                        <div class="status"></div>
+                        <div class="status" id="status"></div>
                     </div>
                     <!--Grid column-->
 
@@ -200,30 +200,45 @@
     <script src="./vendor/waypoints/noframework.waypoints.js"></script>
 
     <script src="./js/main.js"></script>
+    <!-- Add this script tag before your custom script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
-    document.getElementById('status').innerHTML = "Sending...";
-    formData = {
-        'name': $('input[name=name]').val(),
-        'email': $('input[name=email]').val(),
-        'subject': $('input[name=subject]').val(),
-        'message': $('textarea[name=message]').val()
-    };
+    function validateForm() {
+        //get input field values data to be sent to server
+        //document.getElementById('status').innerHTML = "Sending...";
+        formData = {
+            'name': $('input[name=name]').val(),
+            'email': $('input[name=email]').val(),
+            'subject': $('input[name=subject]').val(),
+            'message': $('textarea[name=message]').val()
+        };
 
 
-    $.ajax({
-        url: "mail.php",
-        type: "POST",
-        data: formData,
-        success: function(data, textStatus, jqXHR) {
+        $.ajax({
+            url: "mail.php",
+            type: "POST",
+            data: formData,
+            success: function(data, textStatus, jqXHR) {
+                console.log(data.message);
+                //$('#status').text(data.message);
+                alert("Đã gửi mail đến tôi");
+                // Clear form fields
+                $("#contact-form").trigger("reset");
+                if (data.code) //If mail was sent successfully, reset the form.
+                    $('#contact-form').closest('form').find("input[type=text], textarea").val("");
 
-            $('#status').text(data.message);
-            if (data.code) //If mail was sent successfully, reset the form.
-                $('#contact-form').closest('form').find("input[type=text], textarea").val("");
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-            $('#status').text(jqXHR);
-        }
-    });
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                //$('#status').text(jqXHR);
+                alert(jqXHR);
+            }
+        });
+
+
+
+    }
     </script>
 </body>
 
